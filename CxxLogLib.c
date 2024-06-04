@@ -4,17 +4,41 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
-static const char *LEVEL_STRINGS[] = {
+#ifndef _WIN32
+#include <windows.h>
+#endif
+
+/*
+static const char *COLORS[] = {
+  "\033[35m",
+  "\033[31m",
+  "\033[33m",
+  "\033[33m",
+  "\033[32m"
+};
+*/
+
+static const char *LEVELS[] = {
   "INFO", "DEBUG", "WARNING", "ERROR", "FATAL"
 };
 
 static FILE *__stream;
+
 
 void CLL_init()
 {
   __stream = stdout;
 
   // windows bullshit to make ansi escape sequences work
+#ifndef _WIN32
+  const HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+
+  DWORD dwMode;
+  GetConsoleMode(hOut, &dwMode);
+
+  dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+  SetConsoleMode(hOut, dwMode);
+#endif
 }
 
 void CLL_setLoggingStream(FILE *stream)
@@ -25,15 +49,13 @@ void CLL_setLoggingStream(FILE *stream)
 void __CLL_log(enum CLL_LogLevel level, const char *func, int line,
                const char *file, const char *format, ...)
 {
-  const char *levelString = LEVEL_STRINGS[(int)level];
-
   time_t t;
-  char tStr[25] = "";
+  char timeString[25] = "";
   time(&t);
-  memcpy(tStr, ctime(&t), 24);
+  memcpy(timeString, ctime(&t), 24);
 
-  fprintf(__stream, "%s | %-7s | %s:%d:%s -> ",
-          tStr, levelString, file, line, func);
+  fprintf(__stream, "%s [ %s ] %s:%d:%s -> ",
+          timeString, LEVELS[level], file, line, func);
 
   va_list args;
   va_start(args, format);

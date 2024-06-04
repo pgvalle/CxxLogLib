@@ -1,7 +1,6 @@
 #ifndef _CXX_LOG_LIB_H_
 #define _CXX_LOG_LIB_H_
 
-#include <assert.h>
 #include <stdio.h>
 #include <stdbool.h>
 
@@ -18,12 +17,12 @@ void CLL_init();
 void CLL_setLoggingStream(FILE *stream);
 
 #define CLL_log(level, format, ...)\
-  __CLL_log(level, __ASSERT_FUNCTION, __LINE__, __FILE__, format, ##__VA_ARGS__)
+  __CLL_log(level, __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
 
 #define CLL_assert(condition, format, ...)\
   if (!condition)\
   {\
-    __CLL_log(CLL_LOG_FATAL, __ASSERT_FUNCTION, __LINE__,\
+    __CLL_log(CLL_LOG_FATAL, __func__, __LINE__,\
               __FILE__, format, ##__VA_ARGS__);\
   }
 
