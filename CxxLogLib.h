@@ -8,7 +8,7 @@ enum CLL_LogLevel
 {
   CLL_LOG_INFO = 0,
   CLL_LOG_DEBUG,
-  CLL_LOG_WARNING,
+  CLL_LOG_WARN,
   CLL_LOG_ERROR,
   CLL_LOG_FATAL
 };
@@ -26,11 +26,11 @@ void CLL_setLoggingStream(FILE *stream);
               __FILE__, format, ##__VA_ARGS__);\
   }
 
-#define CLL_inform(format, ...) CLL_log(CLL_LOG_INFO, format, ##__VA_ARGS__)
+#define CLL_info(format, ...) CLL_log(CLL_LOG_INFO, format, ##__VA_ARGS__)
 #define CLL_debug(format, ...) CLL_log(CLL_LOG_DEBUG, format, ##__VA_ARGS__)
-#define CLL_warn(format, ...) CLL_log(CLL_LOG_WARNING, format, ##__VA_ARGS__)
+#define CLL_warn(format, ...) CLL_log(CLL_LOG_WARN, format, ##__VA_ARGS__)
 #define CLL_error(format, ...) CLL_log(CLL_LOG_ERROR, format, ##__VA_ARGS__)
-#define CLL_panic(format, ...) CLL_log(CLL_LOG_FATAL, format, ##__VA_ARGS__)
+#define CLL_fatal(format, ...) CLL_log(CLL_LOG_FATAL, format, ##__VA_ARGS__)
 
 void __CLL_log(enum CLL_LogLevel level, const char *func, int line,
                const char *file, const char *format, ...);

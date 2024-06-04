@@ -19,11 +19,10 @@ static const char *COLORS[] = {
 */
 
 static const char *LEVELS[] = {
-  "INFO", "DEBUG", "WARNING", "ERROR", "FATAL"
+  "INFO", "DEBUG", "WARN", "ERROR", "FATAL"
 };
 
 static FILE *__stream;
-
 
 void CLL_init()
 {
@@ -46,6 +45,21 @@ void CLL_setLoggingStream(FILE *stream)
   __stream = stream;
 }
 
+void printCentered(FILE *stream, const char *str, int width)
+{
+  const int nOfSpaces = width - strlen(str);
+
+  int padding = nOfSpaces / 2;
+  if (padding < 0) {
+    padding = 0;
+  }
+
+  fprintf(stream, "%*s", padding, "");
+  fputs(str, stream);
+  // odd number of spaces to insert means we're missing one
+  fprintf(stream, "%*s", padding + nOfSpaces % 2, "");
+}
+
 void __CLL_log(enum CLL_LogLevel level, const char *func, int line,
                const char *file, const char *format, ...)
 {
@@ -54,8 +68,9 @@ void __CLL_log(enum CLL_LogLevel level, const char *func, int line,
   time(&t);
   memcpy(timeString, ctime(&t), 24);
 
-  fprintf(__stream, "%s [ %s ] %s:%d:%s -> ",
-          timeString, LEVELS[level], file, line, func);
+  fprintf(__stream, "%s [", timeString);
+  printCentered(__stream, LEVELS[level], 7);
+  fprintf(__stream, "] %s:%d:%s -> ", file, line, func);
 
   va_list args;
   va_start(args, format);

@@ -4,13 +4,11 @@ int main()
 {
   CLL_init();
 
-  FILE *f = fopen("file.txt", "w");
-  CLL_assert(f, "file not found");
-  CLL_setLoggingStream(f);
+  CLL_info("file not found");
+  CLL_debug("file not found");
+  CLL_warn("file not found");
+  CLL_error("file not found");
+  CLL_fatal("file not found");
 
-  CLL_debug("rljasdçlfjkasdçlf");
-  CLL_inform("rljasdçlfjkasdasdfasdfasdçlf");
-
-  fclose(f);
   return 0;
 }
