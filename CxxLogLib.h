@@ -15,6 +15,7 @@ enum CLL_LogLevel
 
 void CLL_init();
 void CLL_setLoggingStream(FILE *stream);
+void CLL_setColors(bool colors);
 
 #define CLL_log(level, format, ...)\
   __CLL_log(level, __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
