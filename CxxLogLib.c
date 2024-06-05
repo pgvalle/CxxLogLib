@@ -8,7 +8,6 @@
 #include <windows.h>
 #endif
 
-/*
 static const char *COLORS[] = {
   "\033[35m",
   "\033[31m",
@@ -16,17 +15,18 @@ static const char *COLORS[] = {
   "\033[33m",
   "\033[32m"
 };
-*/
 
 static const char *LEVELS[] = {
-  "INFO", "DEBUG", "WARN", "ERROR", "FATAL"
+  " INFO  ", " DEBUG ", " WARN  ", " ERROR ", " FATAL "
 };
 
 static FILE *__stream;
+static bool __colors;
 
 void CLL_init()
 {
   __stream = stdout;
+  __colors = false;
 
   // windows bullshit to make ansi escape sequences work
 #ifndef _WIN32
@@ -45,19 +45,9 @@ void CLL_setLoggingStream(FILE *stream)
   __stream = stream;
 }
 
-void printCentered(FILE *stream, const char *str, int width)
+void CLL_setColors(bool colors)
 {
-  const int nOfSpaces = width - strlen(str);
-
-  int padding = nOfSpaces / 2;
-  if (padding < 0) {
-    padding = 0;
-  }
-
-  fprintf(stream, "%*s", padding, "");
-  fputs(str, stream);
-  // odd number of spaces to insert means we're missing one
-  fprintf(stream, "%*s", padding + nOfSpaces % 2, "");
+  __colors = colors;
 }
 
 void __CLL_log(enum CLL_LogLevel level, const char *func, int line,
@@ -68,9 +58,16 @@ void __CLL_log(enum CLL_LogLevel level, const char *func, int line,
   time(&t);
   memcpy(timeString, ctime(&t), 24);
 
-  fprintf(__stream, "%s [", timeString);
-  printCentered(__stream, LEVELS[level], 7);
-  fprintf(__stream, "] %s:%d:%s -> ", file, line, func);
+  if (__colors)
+  {
+    fprintf(__stream, "%s [%s%s\033[0m] %s:%d:%s -> ", timeString,
+            COLORS[level], LEVELS[level], file, line, func);
+  }
+  else
+  {
+    fprintf(__stream, "%s [%s] %s:%d:%s -> ", timeString,
+            COLORS[level], LEVELS[level], file, line, func);
+  }
 
   va_list args;
   va_start(args, format);
