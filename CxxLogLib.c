@@ -66,7 +66,7 @@ void __CLL_log(enum CLL_LogLevel level, const char *func, int line,
   else
   {
     fprintf(__stream, "%s [%s] %s:%d:%s -> ", timeString,
-            COLORS[level], LEVELS[level], file, line, func);
+            LEVELS[level], file, line, func);
   }
 
   va_list args;
