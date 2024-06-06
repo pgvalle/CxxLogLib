@@ -8,7 +8,7 @@ enum CLL_LogType
 {
   CLL_INFO = 0,
   CLL_DEBUG,
-  CLL_WARN,
+  CLL_WARNING,
   CLL_ERROR,
   CLL_FATAL
 };
@@ -33,7 +33,7 @@ FILE *CLL_createLogFile(const char *prefix);
 
 #define CLL_info(format, ...) CLL_log(CLL_INFO, format, ##__VA_ARGS__)
 #define CLL_debug(format, ...) CLL_log(CLL_DEBUG, format, ##__VA_ARGS__)
-#define CLL_warn(format, ...) CLL_log(CLL_WARN, format, ##__VA_ARGS__)
+#define CLL_warning(format, ...) CLL_log(CLL_WARNING, format, ##__VA_ARGS__)
 #define CLL_error(format, ...) CLL_log(CLL_ERROR, format, ##__VA_ARGS__)
 #define CLL_fatal(format, ...) CLL_log(CLL_FATAL, format, ##__VA_ARGS__)
 

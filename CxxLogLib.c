@@ -9,7 +9,7 @@
 #endif
 
 static const char *LOG_TYPES[] = {
-  "INFO ", "DEBUG", "WARN ", "ERROR", "FATAL"
+  "INFO", "DEBUG", "WARNING", "ERROR", "FATAL"
 };
 
 static const char *LOG_TYPES_COLORS[] = {
@@ -91,21 +91,23 @@ void __CLL_log(enum CLL_LogType type, const char *func, int line,
   const time_t t = time(NULL);
   struct tm *lt = localtime(&t);
 
-  // time and date
+  // time and date info
   fprintf(__stream, "[%4d-%02d-%02d %02d:%02d:%02d] ",
           lt->tm_year + 1900, lt->tm_mon + 1, lt->tm_mday,
           lt->tm_hour, lt->tm_min, lt->tm_sec);
+  
+  // code info
+  fprintf(__stream, "[%s:%d:%s] ", file, line, func);
 
+  // Log type
   if (__colors)
   {
-    fprintf(__stream, "[%s%s\033[0m] ", LOG_TYPES_COLORS[type], LOG_TYPES[type]);
+    fprintf(__stream, "[%s%s\033[0m]: ", LOG_TYPES_COLORS[type], LOG_TYPES[type]);
   }
   else
   {
-    fprintf(__stream, "[%s] ", LOG_TYPES[type]);
+    fprintf(__stream, "[%s]: ", LOG_TYPES[type]);
   }
-
-  fprintf(__stream, "[%s:%d:%s] ", file, line, func);
 
   va_list args;
   va_start(args, format);
