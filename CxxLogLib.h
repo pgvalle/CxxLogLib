@@ -15,6 +15,7 @@ enum CLL_LogType
 
 void CLL_init();
 void CLL_setLoggingStream(FILE *stream);
+// enabling colors when logging to a file messes up output
 void CLL_setColors(bool colors);
 
 #define CLL_log(level, format, ...)\
@@ -23,7 +24,7 @@ void CLL_setColors(bool colors);
 #define CLL_assert(condition, format, ...)\
   if (!condition)\
   {\
-    __CLL_log(CLL_FATAL, __func__, __LINE__, __FILE__, format, ##__VA_ARGS__);\
+    CLL_log(CLL_FATAL, format, ##__VA_ARGS__);\
   }
 
 #define CLL_info(format, ...) CLL_log(CLL_INFO, format, ##__VA_ARGS__)
