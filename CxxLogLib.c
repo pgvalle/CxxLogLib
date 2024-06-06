@@ -84,14 +84,12 @@ void __CLL_log(enum CLL_LogType type, const char *func, int line,
   const time_t t = time(NULL);
   struct tm *lt = localtime(&t);
 
-  // time and date info
-  fprintf(__stream, "[%02dh%02dm%02ds %4d.%02d.%02d] ",
+  // time, date and code info
+  fprintf(__stream, "[%02dh%02dm%02ds %4d.%02d.%02d] [%s:%d in %s] ",
           lt->tm_hour, lt->tm_min, lt->tm_sec,
-          lt->tm_year + 1900, lt->tm_mon + 1, lt->tm_mday);
+          lt->tm_year + 1900, lt->tm_mon + 1, lt->tm_mday,
+          file, line, func);
   
-  // code info
-  fprintf(__stream, "[%s:%d in %s] ", file, line, func);
-
   // Log type
   if (__colors)
   {
