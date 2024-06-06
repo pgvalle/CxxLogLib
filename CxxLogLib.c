@@ -77,7 +77,7 @@ void __CLL_log(enum CLL_LogType type, const char *func, int line,
   fprintf(__stream, "\n");
   fflush(__stream);
 
-  if (type == CLL_LOG_FATAL)
+  if (type == CLL_FATAL)
   {
     exit(-1);
   }
