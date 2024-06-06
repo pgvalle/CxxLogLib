@@ -8,16 +8,16 @@
 #include <windows.h>
 #endif
 
-static const char *COLORS[] = {
-  "\033[35m",
-  "\033[31m",
-  "\033[33m",
-  "\033[33m",
-  "\033[32m"
+static const char *LOG_TYPES[] = {
+  " INFO  ", " DEBUG ", " WARN  ", " ERROR ", " FATAL "
 };
 
-static const char *LEVELS[] = {
-  " INFO  ", " DEBUG ", " WARN  ", " ERROR ", " FATAL "
+static const char *LOG_TYPES_COLORS[] = {
+  "\033[32m",
+  "\033[36m",
+  "\033[33m",
+  "\033[31m",
+  "\033[35m"
 };
 
 static FILE *__stream;
@@ -50,7 +50,7 @@ void CLL_setColors(bool colors)
   __colors = colors;
 }
 
-void __CLL_log(enum CLL_LogLevel level, const char *func, int line,
+void __CLL_log(enum CLL_LogType type, const char *func, int line,
                const char *file, const char *format, ...)
 {
   time_t t;
@@ -61,12 +61,12 @@ void __CLL_log(enum CLL_LogLevel level, const char *func, int line,
   if (__colors)
   {
     fprintf(__stream, "%s [%s%s\033[0m] %s:%d:%s -> ", timeString,
-            COLORS[level], LEVELS[level], file, line, func);
+            LOG_TYPES_COLORS[type], LOG_TYPES[type], file, line, func);
   }
   else
   {
     fprintf(__stream, "%s [%s] %s:%d:%s -> ", timeString,
-            LEVELS[level], file, line, func);
+            LOG_TYPES[type], file, line, func);
   }
 
   va_list args;
@@ -77,7 +77,7 @@ void __CLL_log(enum CLL_LogLevel level, const char *func, int line,
   fprintf(__stream, "\n");
   fflush(__stream);
 
-  if (level == CLL_LOG_FATAL)
+  if (type == CLL_LOG_FATAL)
   {
     exit(-1);
   }

@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-enum CLL_LogLevel
+enum CLL_LogType
 {
   CLL_LOG_INFO = 0,
   CLL_LOG_DEBUG,
@@ -33,7 +33,7 @@ void CLL_setColors(bool colors);
 #define CLL_error(format, ...) CLL_log(CLL_LOG_ERROR, format, ##__VA_ARGS__)
 #define CLL_fatal(format, ...) CLL_log(CLL_LOG_FATAL, format, ##__VA_ARGS__)
 
-void __CLL_log(enum CLL_LogLevel level, const char *func, int line,
+void __CLL_log(enum CLL_LogType type, const char *func, int line,
                const char *file, const char *format, ...);
 
 #endif // _CXX_LOG_LIB_H
