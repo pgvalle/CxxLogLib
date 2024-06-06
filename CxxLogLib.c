@@ -40,7 +40,7 @@ void CLL_init()
 #endif
 }
 
-void CLL_setLoggingStream(FILE *stream)
+void CLL_setLogStream(FILE *stream)
 {
   __stream = stream;
 }

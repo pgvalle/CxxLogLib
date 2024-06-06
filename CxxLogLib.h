@@ -14,9 +14,8 @@ enum CLL_LogType
 };
 
 void CLL_init();
-void CLL_setLoggingStream(FILE *stream);
-// enabling colors when logging to a file messes up output
-void CLL_setColors(bool colors);
+void CLL_setLogStream(FILE *stream);
+void CLL_setColors(bool colors);  // colors mess up with file outputs
 
 #define CLL_log(level, format, ...)\
   __CLL_log(level, __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
