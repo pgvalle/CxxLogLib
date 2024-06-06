@@ -15,7 +15,12 @@ enum CLL_LogType
 
 void CLL_init();
 void CLL_setLogStream(FILE *stream);
-void CLL_setColors(bool colors);  // colors mess up with file outputs
+// Colors get messed up in non-console/non-terminal streams.
+void CLL_setColors(bool colors);
+
+// You can call it only once per second. File naming problem.
+// Prefix is a non-empty string that must be up to 32 characters.
+FILE *CLL_createLogFile(const char *prefix);
 
 #define CLL_log(level, format, ...)\
   __CLL_log(level, __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
