@@ -52,7 +52,7 @@ void CLL_setColors(bool colors)
 
 static time_t previousTimeSuffix = 0;
 
-FILE *CLL_createLogFile(const char *prefix)
+FILE *CLL_createLogFile(const char *name)
 {
   time_t timeSuffix;
   time(&timeSuffix);
@@ -60,29 +60,22 @@ FILE *CLL_createLogFile(const char *prefix)
   // 2 or more files will have the same name if the prefix is equal
   if (timeSuffix == previousTimeSuffix)
   {
-    CLL_error("Wait 1s to create another log file.", prefix);
+    CLL_error("Wait 1s to create another log file.", name);
     return NULL;
   }
 
   previousTimeSuffix = timeSuffix;
 
-  const size_t lenPrefix = strlen(prefix);
-
-  if (lenPrefix > 32)
-  {
-    CLL_error("%s has more than 32 characters.", prefix);
-    return NULL;
-  }
-
-  char logFileName[64] = "";
-  memcpy(logFileName, prefix, lenPrefix);
-
-  logFileName[lenPrefix] = '-';
-
-  const char *suffix = logFileName + lenPrefix + 1;
-
+  const time_t t = time(NULL);
+  struct tm *lt = localtime(&t);
   
-  return fopen(logFileName, "w");
+  char fullName[strlen(name) + 27];
+  sprintf(fullName, "%s-%dh%dm%ds-%d.%02d.%02d.log",
+          name,
+          lt->tm_hour, lt->tm_min, lt->tm_sec,
+          lt->tm_year + 1900, lt->tm_mon + 1, lt->tm_mday);
+
+  return fopen(fullName, "w");
 }
 
 void __CLL_log(enum CLL_LogType type, const char *func, int line,
@@ -92,17 +85,18 @@ void __CLL_log(enum CLL_LogType type, const char *func, int line,
   struct tm *lt = localtime(&t);
 
   // time and date info
-  fprintf(__stream, "[%4d-%02d-%02d %02d:%02d:%02d] ",
-          lt->tm_year + 1900, lt->tm_mon + 1, lt->tm_mday,
-          lt->tm_hour, lt->tm_min, lt->tm_sec);
+  fprintf(__stream, "[%02dh%02dm%02ds %4d.%02d.%02d] ",
+          lt->tm_hour, lt->tm_min, lt->tm_sec,
+          lt->tm_year + 1900, lt->tm_mon + 1, lt->tm_mday);
   
   // code info
-  fprintf(__stream, "[%s:%d:%s] ", file, line, func);
+  fprintf(__stream, "[%s:%d in %s] ", file, line, func);
 
   // Log type
   if (__colors)
   {
-    fprintf(__stream, "[%s%s\033[0m]: ", LOG_TYPES_COLORS[type], LOG_TYPES[type]);
+    fprintf(__stream, "[%s%s\033[0m]: ",
+            LOG_TYPES_COLORS[type], LOG_TYPES[type]);
   }
   else
   {

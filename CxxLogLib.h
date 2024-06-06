@@ -20,7 +20,7 @@ void CLL_setColors(bool colors);
 
 // You can call it only once per second. File naming problem.
 // Prefix is a non-empty string that must be up to 32 characters.
-FILE *CLL_createLogFile(const char *prefix);
+FILE *CLL_createLogFile(const char *name);
 
 #define CLL_log(level, format, ...)\
   __CLL_log(level, __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
