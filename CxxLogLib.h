@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+
 enum CLL_LogType
 {
   CLL_INFO = 0,
@@ -13,8 +14,11 @@ enum CLL_LogType
   CLL_FATAL
 };
 
+
 // The library will consider the main thread as the one you call this function in.
+// Set options after calling this.
 void CLL_init();
+// Safe to call in any thread, but only works in the thread CLL_init was called.
 void CLL_quit();
 
 // Safe to call in any thread, but only works in the thread CLL_init was called.
@@ -23,9 +27,6 @@ void CLL_setLogStream(FILE *stream);
 // Safe to call in any thread, but only works in the thread CLL_init was called.
 void CLL_setColors(bool colors);
 
-// You can call it only once per second and in the main thread.
-// Prefix is a non-empty string that must be up to 32 characters.
-FILE *CLL_createLogFile(const char *name);
 
 #define CLL_log(level, format, ...)\
   __CLL_log(level, __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
