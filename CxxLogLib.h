@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-
 enum CLL_LogType
 {
   CLL_INFO = 0,
@@ -13,7 +12,6 @@ enum CLL_LogType
   CLL_ERROR,
   CLL_FATAL
 };
-
 
 // The library will consider the main thread as the one you call this function in.
 // Set options after calling this.
@@ -27,9 +25,8 @@ void CLL_setLogStream(FILE *stream);
 // Safe to call in any thread, but only works in the thread CLL_init was called.
 void CLL_setColors(bool colors);
 
-
 #define CLL_log(level, format, ...)\
-  __CLL_log(level, __func__, __LINE__, __FILE__, format, ##__VA_ARGS__)
+  __CLL_log(level, __func__, format, ##__VA_ARGS__)
 
 #define CLL_assert(condition, format, ...)\
   if (!condition)\
@@ -43,7 +40,6 @@ void CLL_setColors(bool colors);
 #define CLL_error(format, ...) CLL_log(CLL_ERROR, format, ##__VA_ARGS__)
 #define CLL_fatal(format, ...) CLL_log(CLL_FATAL, format, ##__VA_ARGS__)
 
-void __CLL_log(enum CLL_LogType type, const char *func, int line,
-               const char *file, const char *format, ...);
+void __CLL_log(enum CLL_LogType type, const char *func, const char *fmt, ...);
 
 #endif // _CXX_LOG_LIB_H
