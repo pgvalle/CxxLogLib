@@ -34,6 +34,9 @@ void CLL_init()
   _.stream = stdout;
   _.colors = false;
 
+  _.mainThread = pthread_self();
+  pthread_mutex_init(&_.logMutex, NULL);
+
   // windows bullshit to make ansi escape sequences work
 #ifndef _WIN32
   const HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -43,12 +46,8 @@ void CLL_init()
 
   dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
   SetConsoleMode(hOut, dwMode);
-#endif
-
-  _.mainThread = pthread_self();
-  pthread_mutex_init(&_.logMutex, NULL);
+#endif  
 }
-
 
 void CLL_quit()
 {
@@ -59,7 +58,6 @@ void CLL_quit()
   }
 }
 
-
 void CLL_setLogStream(FILE *stream)
 {
   if (_.initialized && _.mainThread == pthread_self())
@@ -68,7 +66,6 @@ void CLL_setLogStream(FILE *stream)
   }
 }
 
-
 void CLL_setColors(bool colors)
 {
   if (_.initialized && _.mainThread == pthread_self())
@@ -76,7 +73,6 @@ void CLL_setColors(bool colors)
     _.colors = colors;
   }
 }
-
 
 static const char *LOG_TYPES[] = {
   "INFO", "DEBUG", "WARNING", "ERROR", "FATAL"
@@ -90,34 +86,39 @@ static const char *LOG_TYPES_COLORS[] = {
   "\033[35m"
 };
 
-void __CLL_log(enum CLL_LogType type, const char *func, int line,
-               const char *file, const char *format, ...)
+void __CLL_log(enum CLL_LogType type, const char *func, const char *fmt, ...)
 {
+  if (!_.initialized)
+  {
+    return;
+  }
+
   const time_t t = time(NULL);
   struct tm *lt = localtime(&t);
 
   pthread_mutex_lock(&_.logMutex);  // writing to _.stream is critical
 
-  // time, date and code info
-  fprintf(_.stream, "[%02dh%02dm%02ds %4d.%02d.%02d] [%s:%d in %s] ",
-          lt->tm_hour, lt->tm_min, lt->tm_sec,
+  // time and date
+  fprintf(_.stream, "[ %4d-%02d-%02d %02d:%02d:%02d %s tid:%lu ",
           lt->tm_year + 1900, lt->tm_mon + 1, lt->tm_mday,
-          file, line, func);
-  
+          lt->tm_hour, lt->tm_min, lt->tm_sec,
+          func,
+          pthread_self());
+
   // Log type
   if (_.colors)
   {
-    fprintf(_.stream, "[%s%s\033[0m]: ",
+    fprintf(_.stream, "%s%s\033[0m ] ",
             LOG_TYPES_COLORS[type], LOG_TYPES[type]);
   }
   else
   {
-    fprintf(_.stream, "[%s]: ", LOG_TYPES[type]);
+    fprintf(_.stream, "%s ] ", LOG_TYPES[type]);
   }
 
   va_list args;
-  va_start(args, format);
-  vfprintf(_.stream, format, args);
+  va_start(args, fmt);
+  vfprintf(_.stream, fmt, args);
   va_end(args);
 
   fprintf(_.stream, "\n");
