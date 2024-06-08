@@ -4,7 +4,7 @@
 #include <pthread.h>
 #include <stdint.h>
 
-void delay_ms(uint32_t milliseconds) {
+void msDelay(uint32_t milliseconds) {
   // Calculate the target time
   uint32_t target = (uint32_t)(clock() * 1000 / CLOCKS_PER_SEC) + milliseconds;
 
@@ -12,26 +12,30 @@ void delay_ms(uint32_t milliseconds) {
   while ((uint32_t)(clock() * 1000 / CLOCKS_PER_SEC) < target);
 }
 
-void* thread_function(void* arg) {
+void* threadFunction(void* arg)
+{
   CLL_info("file not found");
+  msDelay(1);
   CLL_debug("file not found");
   CLL_warning("file not found");
   CLL_error("file not found");
 
   return NULL;
 }
+
 int main()
 {
   CLL_init();
   CLL_setColors(true);
 
   pthread_t thread;
-  pthread_create(&thread, NULL, thread_function, NULL);
+  pthread_create(&thread, NULL, threadFunction, NULL);
 
   CLL_info("file not found");
   CLL_debug("file not found");
-  delay_ms(100);
+  msDelay(1);
   CLL_warning("file not found");
+  msDelay(2);
   CLL_error("file not found");
 
   // Wait for the thread to finish
