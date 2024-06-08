@@ -13,12 +13,17 @@ enum CLL_LogType
   CLL_FATAL
 };
 
+// The library will consider the main thread as the one you call this function in.
 void CLL_init();
+void CLL_quit();
+
+// Safe to call in any thread, but only works in the thread CLL_init was called.
 void CLL_setLogStream(FILE *stream);
 // Colors get messed up in non-console/non-terminal streams.
+// Safe to call in any thread, but only works in the thread CLL_init was called.
 void CLL_setColors(bool colors);
 
-// You can call it only once per second. File naming problem.
+// You can call it only once per second and in the main thread.
 // Prefix is a non-empty string that must be up to 32 characters.
 FILE *CLL_createLogFile(const char *name);
 
