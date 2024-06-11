@@ -74,7 +74,7 @@ void CLL_set_colors(bool colors)
   }
 }
 
-void __CLL_log(enum CLL_LogType type, const char *func, const char *fmt, ...)
+void _CLL_log(enum CLL_LogType type, const char *func, const char *fmt, ...)
 {
   static const char *TYPE_INFO[2][5] = {
     "INFO",     "DEBUG",    "WARNING",  "ERROR",    "FATAL",
