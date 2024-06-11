@@ -1,6 +1,7 @@
 #ifndef _CXX_LOG_LIB_H_
 #define _CXX_LOG_LIB_H_
 
+#include <stdbool.h>
 #include <stdio.h>
 
 enum CLL_LogType
@@ -19,7 +20,7 @@ void CLL_init();
 void CLL_quit();
 
 // Safe to call in any thread, but only works in the thread CLL_init was called.
-void CLL_set_log_stream(FILE *stream);
+void CLL_set_stream(FILE *stream);
 // Colors get messed up in non-console/non-terminal streams.
 // Safe to call in any thread, but only works in the thread CLL_init was called.
 void CLL_set_colors(bool colors);

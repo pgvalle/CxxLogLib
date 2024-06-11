@@ -10,6 +10,23 @@
 
 #ifdef _WIN32
 #include <windows.h>
+
+// ansi escape sequences don't work in cmd by default
+void fix_windows_console()
+{
+  const DWORD handles2fix[] = {
+    STD_OUTPUT_HANDLE, STD_ERROR_HANDLE
+  };
+
+  for (int i = 0; i < 2; i++)
+  {
+    const HANDLE handle = GetStdHandle(handles2fix[i]);
+
+    DWORD options;
+    GetConsoleMode(handle, &options);
+    SetConsoleMode(handle, options | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+  }
+}
 #endif
 
 static struct
@@ -25,7 +42,6 @@ static struct
 
 void CLL_init()
 {
-  // Call CLL_init only once. To call it again, call CLL_quit before.
   if (_.initialized)
   {
     return;
@@ -39,30 +55,28 @@ void CLL_init()
   _.main_thread = pthread_self();
   pthread_mutex_init(&_.log_mutex, NULL);
 
-  // windows bullshit to make ansi escape sequences work
 #ifdef _WIN32
-  const HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+  fix_windows_console();
+#endif
+}
 
-  DWORD dwMode;
-  GetConsoleMode(hOut, &dwMode);
-
-  dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-  SetConsoleMode(hOut, dwMode);
-#endif  
+bool _is_main_thread()
+{
+  return _.main_thread == pthread_self();
 }
 
 void CLL_quit()
 {
-  if (_.initialized && _.main_thread == pthread_self())
+  if (_.initialized && _is_main_thread())
   {
     _.initialized = false;
     pthread_mutex_destroy(&_.log_mutex);
   }
 }
 
-void CLL_set_log_stream(FILE *stream)
+void CLL_set_stream(FILE *stream)
 {
-  if (_.initialized && _.main_thread == pthread_self())
+  if (_.initialized && _is_main_thread())
   {
     _.stream = stream;
   }
@@ -70,26 +84,19 @@ void CLL_set_log_stream(FILE *stream)
 
 void CLL_set_colors(bool colors)
 {
-  if (_.initialized && _.main_thread == pthread_self())
+  if (_.initialized && _is_main_thread())
   {
     _.colors = colors;
   }
 }
 
-void _CLL_log(enum CLL_LogType type, const char *func, const char *fmt, ...)
+void _log_meta_info(enum CLL_LogType type, const char *func)
 {
   static const char *TYPE_INFO[2][5] = {
         "INFO",    "DEBUG",  "WARNING",    "ERROR",    "FATAL",
     "\033[32m", "\033[36m", "\033[33m", "\033[31m", "\033[35m"
   };
 
-  if (!_.initialized)
-  {
-    return;
-  }
-
-  pthread_mutex_lock(&_.log_mutex);  // entire log function should be atomic
-  
   const time_t t = time(NULL);
   const struct tm *lt = localtime(&t);
 
@@ -102,7 +109,20 @@ void _CLL_log(enum CLL_LogType type, const char *func, const char *fmt, ...)
           lt->tm_hour, lt->tm_min, lt->tm_sec,
           func,
           color_str, type_str, reset_str);
+}
 
+void _CLL_log(enum CLL_LogType type, const char *func, const char *fmt, ...)
+{
+  if (!_.initialized)
+  {
+    return;
+  }
+
+  pthread_mutex_lock(&_.log_mutex);  // entire log function should be atomic
+  
+  _log_meta_info(type, func);
+
+  // log message itself
   va_list args;
   va_start(args, fmt);
   vfprintf(_.stream, fmt, args);
