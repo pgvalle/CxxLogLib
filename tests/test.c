@@ -1,4 +1,4 @@
-#include "CxxLogLib.h"
+#include "../CxxLogLib.h"
 #include <time.h>
 #include <stdlib.h>
 #include <pthread.h>
