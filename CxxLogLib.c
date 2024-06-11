@@ -98,14 +98,12 @@ void __CLL_log(enum CLL_LogType type, const char *func, const char *fmt, ...)
 
   pthread_mutex_lock(&_.logMutex);  // writing to _.stream is critical
 
-  // time and date
   fprintf(_.stream, "[ %4d-%02d-%02d %02d:%02d:%02d %s tid:%lu ",
           lt->tm_year + 1900, lt->tm_mon + 1, lt->tm_mday,
           lt->tm_hour, lt->tm_min, lt->tm_sec,
           func,
           pthread_self());
 
-  // Log type
   if (_.colors)
   {
     fprintf(_.stream, "%s%s\033[0m ] ",
