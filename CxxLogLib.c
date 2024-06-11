@@ -90,25 +90,45 @@ void CLL_set_colors(bool colors)
   }
 }
 
-void _log_meta_info(enum CLL_LogType type, const char *func)
+const char *_get_log_type_str(enum CLL_LogType type)
 {
-  static const char *TYPE_INFO[2][5] = {
-        "INFO",    "DEBUG",  "WARNING",    "ERROR",    "FATAL",
+  static const char *TYPES[] = {
+    "INFO", "DEBUG", "WARNING", "ERROR", "FATAL"
+  };
+
+  return TYPES[type];
+}
+
+const char *_get_log_type_color_str(enum CLL_LogType type)
+{
+  static const char *COLORS[] = {
     "\033[32m", "\033[36m", "\033[33m", "\033[31m", "\033[35m"
   };
 
+  return COLORS[type];
+}
+
+void _log_meta_info(enum CLL_LogType type, const char *func)
+{
   const time_t t = time(NULL);
   const struct tm *lt = localtime(&t);
 
-  const char *color_str = _.colors ? TYPE_INFO[1][type] : "",
-             *type_str  = TYPE_INFO[0][type],
-             *reset_str = _.colors ? "\033[0m" : "";
-
-  fprintf(_.stream, "[ %4d-%02d-%02d %02d:%02d:%02d %s %s%s%s ] ",
+  fprintf(_.stream, "[ %4d-%02d-%02d %02d:%02d:%02d %s ",
           lt->tm_year + 1900, lt->tm_mon + 1, lt->tm_mday,
           lt->tm_hour, lt->tm_min, lt->tm_sec,
-          func,
-          color_str, type_str, reset_str);
+          func);
+
+  const char *type_str = _get_log_type_str(type);
+
+  if (_.colors)
+  {
+    const char *color_str = _get_log_type_color_str(type);
+    fprintf(_.stream, "%s%s\033[0m ] ", color_str, type_str);
+  }
+  else
+  {
+    fprintf(_.stream, "%s ] ", type_str);
+  }
 }
 
 void _CLL_log(enum CLL_LogType type, const char *func, const char *fmt, ...)
