@@ -25,21 +25,20 @@ void CLL_set_log_stream(FILE *stream);
 // Safe to call in any thread, but only works in the thread CLL_init was called.
 void CLL_set_colors(bool colors);
 
-#define CLL_log(level, format, ...)\
-  __CLL_log(level, __func__, format, ##__VA_ARGS__)
+#define CLL_log(type, fmt, ...) _CLL_log(type, __func__, fmt, ##__VA_ARGS__)
 
-#define CLL_assert(condition, format, ...)\
+#define CLL_assert(condition, fmt, ...)\
   if (!condition)\
   {\
-    CLL_fatal(format, ##__VA_ARGS__);\
+    CLL_fatal(fmt, ##__VA_ARGS__);\
   }
 
-#define CLL_info(format, ...) CLL_log(CLL_INFO, format, ##__VA_ARGS__)
-#define CLL_debug(format, ...) CLL_log(CLL_DEBUG, format, ##__VA_ARGS__)
-#define CLL_warning(format, ...) CLL_log(CLL_WARNING, format, ##__VA_ARGS__)
-#define CLL_error(format, ...) CLL_log(CLL_ERROR, format, ##__VA_ARGS__)
-#define CLL_fatal(format, ...) CLL_log(CLL_FATAL, format, ##__VA_ARGS__)
+#define CLL_info(fmt, ...) CLL_log(CLL_INFO, fmt, ##__VA_ARGS__)
+#define CLL_debug(fmt, ...) CLL_log(CLL_DEBUG, fmt, ##__VA_ARGS__)
+#define CLL_warning(fmt, ...) CLL_log(CLL_WARNING, fmt, ##__VA_ARGS__)
+#define CLL_error(fmt, ...) CLL_log(CLL_ERROR, fmt, ##__VA_ARGS__)
+#define CLL_fatal(fmt, ...) CLL_log(CLL_FATAL, fmt, ##__VA_ARGS__)
 
-void __CLL_log(enum CLL_LogType type, const char *func, const char *fmt, ...);
+void _CLL_log(enum CLL_LogType type, const char *func, const char *fmt, ...);
 
 #endif // _CXX_LOG_LIB_H
