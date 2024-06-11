@@ -26,7 +26,7 @@ void* threadFunction(void* arg)
 int main()
 {
   CLL_init();
-  CLL_setColors(true);
+  CLL_set_colors(true);
 
   pthread_t thread;
   pthread_create(&thread, NULL, threadFunction, NULL);
