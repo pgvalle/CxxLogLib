@@ -22,6 +22,8 @@ void* thread_func(void* arg)
   CLL_warning("file not found");
   ms_delay(10);
   CLL_error("file not found");
+  ms_delay(10);
+  CLL_error("file not found");
 
   return NULL;
 }
@@ -32,12 +34,14 @@ int main()
   CLL_set_colors(true);
 
   pthread_t thread;
-  pthread_create(&thread, NULL, threadFunction, NULL);
+  pthread_create(&thread, NULL, thread_func, NULL);
 
   CLL_info("file not found");
-  msDelay(12);
+  ms_delay(12);
   CLL_debug("file not found");
-  msDelay(12);
+  ms_delay(12);
+  CLL_error("file not found");
+  ms_delay(12);
   CLL_error("file not found");
 
   // Wait for the thread to finish
