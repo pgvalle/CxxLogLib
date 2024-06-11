@@ -1,9 +1,11 @@
 #include "CxxLogLib.h"
+
 #include <stdarg.h>
+#include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
 #include <pthread.h>
 
 #ifdef _WIN32
@@ -77,11 +79,12 @@ void CLL_set_colors(bool colors)
 void _CLL_log(enum CLL_LogType type, const char *func, const char *fmt, ...)
 {
   static const char *TYPE_INFO[2][5] = {
-    "INFO",     "DEBUG",    "WARNING",  "ERROR",    "FATAL",
+        "INFO",    "DEBUG",  "WARNING",    "ERROR",    "FATAL",
     "\033[32m", "\033[36m", "\033[33m", "\033[31m", "\033[35m"
   };
 
-  if (!_.initialized) {
+  if (!_.initialized)
+  {
     return;
   }
 
@@ -91,7 +94,7 @@ void _CLL_log(enum CLL_LogType type, const char *func, const char *fmt, ...)
   const struct tm *lt = localtime(&t);
 
   const char *color_str = _.colors ? TYPE_INFO[1][type] : "",
-             *type_str  =  TYPE_INFO[0][type],
+             *type_str  = TYPE_INFO[0][type],
              *reset_str = _.colors ? "\033[0m" : "";
 
   fprintf(_.stream, "[ %4d-%02d-%02d %02d:%02d:%02d %s %s%s%s ] ",
@@ -108,8 +111,8 @@ void _CLL_log(enum CLL_LogType type, const char *func, const char *fmt, ...)
   fprintf(_.stream, "\n");
   fflush(_.stream);
 
-  pthread_mutex_unlock(&_.log_mutex);
-
+  pthread_mutex_unlock(&_.log_mutex);  // Now we're safe
+  
   if (type == CLL_FATAL)
   {
     exit(-1);

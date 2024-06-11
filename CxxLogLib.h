@@ -2,7 +2,6 @@
 #define _CXX_LOG_LIB_H_
 
 #include <stdio.h>
-#include <stdbool.h>
 
 enum CLL_LogType
 {
