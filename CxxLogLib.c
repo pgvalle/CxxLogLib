@@ -1,8 +1,8 @@
 #include "CxxLogLib.h"
-#include <time.h>
-#include <string.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
 #include <pthread.h>
 
@@ -74,45 +74,31 @@ void CLL_setColors(bool colors)
   }
 }
 
-static const char *LOG_TYPES[] = {
-  "INFO", "DEBUG", "WARNING", "ERROR", "FATAL"
-};
-
-static const char *LOG_TYPES_COLORS[] = {
-  "\033[32m",
-  "\033[36m",
-  "\033[33m",
-  "\033[31m",
-  "\033[35m"
-};
-
 void __CLL_log(enum CLL_LogType type, const char *func, const char *fmt, ...)
 {
-  if (!_.initialized)
-  {
+  static const char *TYPE_INFO[2][5] = {
+    "INFO",     "DEBUG",    "WARNING",  "ERROR",    "FATAL",
+    "\033[32m", "\033[36m", "\033[33m", "\033[31m", "\033[35m"
+  };
+
+  if (!_.initialized) {
     return;
   }
 
+  pthread_mutex_lock(&_.logMutex);  // entire log function should be atomic
+  
   const time_t t = time(NULL);
-  struct tm *lt = localtime(&t);
+  const struct tm *lt = localtime(&t);
 
-  pthread_mutex_lock(&_.logMutex);  // writing to _.stream is critical
+  const char *colorStr = _.colors ? TYPE_INFO[1][type] : "",
+             *typeStr  =  TYPE_INFO[0][type],
+             *resetStr = _.colors ? "\033[0m" : "";
 
-  fprintf(_.stream, "[ %4d-%02d-%02d %02d:%02d:%02d %s tid:%lu ",
+  fprintf(_.stream, "[ %4d-%02d-%02d %02d:%02d:%02d %s %s%s%s ] ",
           lt->tm_year + 1900, lt->tm_mon + 1, lt->tm_mday,
           lt->tm_hour, lt->tm_min, lt->tm_sec,
           func,
-          pthread_self());
-
-  if (_.colors)
-  {
-    fprintf(_.stream, "%s%s\033[0m ] ",
-            LOG_TYPES_COLORS[type], LOG_TYPES[type]);
-  }
-  else
-  {
-    fprintf(_.stream, "%s ] ", LOG_TYPES[type]);
-  }
+          colorStr, typeStr, resetStr);
 
   va_list args;
   va_start(args, fmt);
@@ -122,7 +108,7 @@ void __CLL_log(enum CLL_LogType type, const char *func, const char *fmt, ...)
   fprintf(_.stream, "\n");
   fflush(_.stream);
 
-  pthread_mutex_unlock(&_.logMutex);  // done writting to _.stream
+  pthread_mutex_unlock(&_.logMutex);
 
   if (type == CLL_FATAL)
   {
