@@ -6,7 +6,7 @@
 
 #include <pthread.h>
 
-#ifndef _WIN32
+#ifdef _WIN32
 #include <windows.h>
 #endif
 
@@ -38,7 +38,7 @@ void CLL_init()
   pthread_mutex_init(&_.logMutex, NULL);
 
   // windows bullshit to make ansi escape sequences work
-#ifndef _WIN32
+#ifdef _WIN32
   const HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 
   DWORD dwMode;
