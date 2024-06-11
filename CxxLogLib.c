@@ -17,8 +17,8 @@ static struct
   FILE *stream;
   bool colors;
 
-  pthread_t mainThread;
-  pthread_mutex_t logMutex;
+  pthread_t main_thread;
+  pthread_mutex_t log_mutex;
 } _;
 
 void CLL_init()
@@ -34,8 +34,8 @@ void CLL_init()
   _.stream = stdout;
   _.colors = false;
 
-  _.mainThread = pthread_self();
-  pthread_mutex_init(&_.logMutex, NULL);
+  _.main_thread = pthread_self();
+  pthread_mutex_init(&_.log_mutex, NULL);
 
   // windows bullshit to make ansi escape sequences work
 #ifdef _WIN32
@@ -51,24 +51,24 @@ void CLL_init()
 
 void CLL_quit()
 {
-  if (_.initialized && _.mainThread == pthread_self())
+  if (_.initialized && _.main_thread == pthread_self())
   {
     _.initialized = false;
-    pthread_mutex_destroy(&_.logMutex);
+    pthread_mutex_destroy(&_.log_mutex);
   }
 }
 
-void CLL_setLogStream(FILE *stream)
+void CLL_set_log_stream(FILE *stream)
 {
-  if (_.initialized && _.mainThread == pthread_self())
+  if (_.initialized && _.main_thread == pthread_self())
   {
     _.stream = stream;
   }
 }
 
-void CLL_setColors(bool colors)
+void CLL_set_colors(bool colors)
 {
-  if (_.initialized && _.mainThread == pthread_self())
+  if (_.initialized && _.main_thread == pthread_self())
   {
     _.colors = colors;
   }
@@ -85,20 +85,20 @@ void __CLL_log(enum CLL_LogType type, const char *func, const char *fmt, ...)
     return;
   }
 
-  pthread_mutex_lock(&_.logMutex);  // entire log function should be atomic
+  pthread_mutex_lock(&_.log_mutex);  // entire log function should be atomic
   
   const time_t t = time(NULL);
   const struct tm *lt = localtime(&t);
 
-  const char *colorStr = _.colors ? TYPE_INFO[1][type] : "",
-             *typeStr  =  TYPE_INFO[0][type],
-             *resetStr = _.colors ? "\033[0m" : "";
+  const char *color_str = _.colors ? TYPE_INFO[1][type] : "",
+             *type_str  =  TYPE_INFO[0][type],
+             *reset_str = _.colors ? "\033[0m" : "";
 
   fprintf(_.stream, "[ %4d-%02d-%02d %02d:%02d:%02d %s %s%s%s ] ",
           lt->tm_year + 1900, lt->tm_mon + 1, lt->tm_mday,
           lt->tm_hour, lt->tm_min, lt->tm_sec,
           func,
-          colorStr, typeStr, resetStr);
+          color_str, type_str, reset_str);
 
   va_list args;
   va_start(args, fmt);
@@ -108,7 +108,7 @@ void __CLL_log(enum CLL_LogType type, const char *func, const char *fmt, ...)
   fprintf(_.stream, "\n");
   fflush(_.stream);
 
-  pthread_mutex_unlock(&_.logMutex);
+  pthread_mutex_unlock(&_.log_mutex);
 
   if (type == CLL_FATAL)
   {
