@@ -1,8 +1,7 @@
 #include "../CxxLogLib.h"
-#include <iostream>
+#include <stdlib.h>
 #include <thread>
 #include <chrono>
-#include <string>
 
 // Function to be executed by each thread
 void thread_func(const char *text, int num_calls, int delay_ms)
@@ -31,6 +30,5 @@ int main()
 
   CLL_quit();
 
-  std::cout << "Both threads have finished executing." << std::endl;
   return 0;
 }
