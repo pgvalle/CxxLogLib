@@ -20,10 +20,10 @@ void CLL_init();
 void CLL_quit();
 
 // Safe to call in any thread, but only works in the thread CLL_init was called.
-void CLL_set_stream(FILE *stream);
+void CLL_setStream(FILE *stream);
 // Colors get messed up in non-console/non-terminal streams.
 // Safe to call in any thread, but only works in the thread CLL_init was called.
-void CLL_set_colors(bool colors);
+void CLL_setColors(bool colors);
 
 #define CLL_log(type, fmt, ...) _CLL_log(type, __func__, fmt, ##__VA_ARGS__)
 
