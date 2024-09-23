@@ -16,7 +16,7 @@ void thread_func(const char *text, int num_calls, int delay_ms)
 int main()
 {
   CLL_init();
-  CLL_set_colors(true);
+  CLL_setColors(true);
 
   CLL_warning("hello");
 

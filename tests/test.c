@@ -31,7 +31,7 @@ void* thread_func(void* arg)
 int main()
 {
   CLL_init();
-  CLL_set_colors(true);
+  CLL_setColors(true);
 
   pthread_t thread;
   pthread_create(&thread, NULL, thread_func, NULL);
